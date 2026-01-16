@@ -9,6 +9,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('SERVER_PORT');
 
+  // 모든 엔드포인트 앞에 '/api' 붙이기
+  // app.setGlobalPrefix('api');
+
   // Validation Pipe 적용하기
   app.useGlobalPipes(
     new ValidationPipe({
