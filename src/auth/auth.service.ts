@@ -2,21 +2,24 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-// import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import bcrypt from 'bcrypt';
+import { LogInDto } from './dtos/log-in.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private configService: ConfigService,
-    // private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
@@ -65,5 +68,35 @@ export class AuthService {
     };
     // 7. 데이터 반환
     return data;
+  }
+
+  /** 로그인(log-in) API **/
+  async logIn(logInDto: LogInDto) {
+    // 1. dto에서 데이터 꺼내기
+    const { email, password } = logInDto;
+    // 2. 해당 email로 가입된 user가 있는지?
+    const user: User = await this.userRepository.findOneBy({ email });
+    // 2-1. 해당 email로 가입된 user가 존재하지 않으면 에러메시지(404)
+    if (!user) {
+      throw new NotFoundException(AUTH_MESSAGES.LOG_IN.FAILURE.NO_USER);
+    }
+    // 3. password가 일치하는지?
+    const matched = bcrypt.compareSync(password, user.password);
+    // 3-1. 일치하지 않는다면 에러메시지(401)
+    if (!matched) {
+      throw new UnauthorizedException(
+        AUTH_MESSAGES.LOG_IN.FAILURE.WRONG_PASSWORD,
+      );
+    }
+    // 4. email 인증을 아직 하지 않았다면 에러메시지(401)
+    if (user.verifiedEmail !== true) {
+      throw new UnauthorizedException(
+        AUTH_MESSAGES.LOG_IN.FAILURE.NOT_VERIFIED,
+      );
+    }
+    // 5. AccessToken 발급
+    const payload = { id: user.userId };
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken };
   }
 }
