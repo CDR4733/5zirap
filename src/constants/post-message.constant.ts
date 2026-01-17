@@ -17,6 +17,7 @@ export const POST_MESSAGE = {
     // 게시글 상세 조회
     READ_DETAIL: {
       SUCCESS: '게시글 상세 조회에 성공하였습니다.',
+      FAIL: '게시글을 찾을 수 없습니다.',
     },
 
     // 화제글 목록 조회
