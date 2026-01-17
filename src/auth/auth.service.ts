@@ -95,7 +95,7 @@ export class AuthService {
       );
     }
     // 5. AccessToken 발급
-    const payload = { id: user.userId };
+    const payload = { userId: user.userId, email: user.email };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
   }
