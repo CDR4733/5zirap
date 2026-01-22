@@ -3,11 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../types/user-role.type';
 import { SocialType } from '../types/social-type.type';
+import { Point } from 'src/point/entities/point.entity';
+import { PointLog } from 'src/point/entities/point-log.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -46,4 +49,9 @@ export class User {
   deletedAt?: Date;
 
   // 관계 설정
+  @OneToMany(() => Point, (point) => point.user, { cascade: true })
+  points: Point[];
+
+  @OneToMany(() => PointLog, (pointLog) => pointLog.user, { cascade: true })
+  pointLogs: PointLog[];
 }
