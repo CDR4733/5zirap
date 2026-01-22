@@ -8,6 +8,7 @@ import { typeOrmModuleOptions } from './configs/database.config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
 import { PostModule } from './post/post.module';
+import { PointModule } from './point/point.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PostModule } from './post/post.module';
     AuthModule,
     UserModule,
     PostModule,
+    PointModule,
   ],
   controllers: [AppController],
   providers: [AppService],
