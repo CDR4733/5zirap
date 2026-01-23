@@ -9,11 +9,17 @@ import {
 } from 'typeorm';
 import { Role } from '../types/user-role.type';
 import { SocialType } from '../types/social-type.type';
+
 import { Point } from 'src/point/entities/point.entity';
 import { PointLog } from 'src/point/entities/point-log.entity';
+
 import { Post } from 'src/post/entities/post.entity';
 import { PostLike } from 'src/post/entities/post-like.entity';
 import { PostDislike } from 'src/post/entities/post-dislike.entity';
+
+import { Comment } from 'src/comment/entities/comment.entity';
+import { CommentLike } from 'src/comment/entities/comment-like.entity';
+import { CommentDislike } from 'src/comment/entities/comment-dislike.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -52,12 +58,14 @@ export class User {
   deletedAt?: Date;
 
   // 관계 설정
+  // 1. Point 관련
   @OneToMany(() => Point, (point) => point.user, { cascade: true })
   points: Point[];
 
   @OneToMany(() => PointLog, (pointLog) => pointLog.user, { cascade: true })
   pointLogs: PointLog[];
 
+  // 2. Post 관련
   @OneToMany(() => Post, (post) => post.user, { cascade: true })
   posts: Post[];
 
@@ -70,4 +78,18 @@ export class User {
     cascade: true,
   })
   postDislikes: PostDislike[];
+
+  // 3. Comment 관련
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
+  comments: Comment[];
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.user, {
+    cascade: true,
+  })
+  commentLikes: CommentLike[];
+
+  @OneToMany(() => CommentDislike, (commentDislike) => commentDislike.user, {
+    cascade: true,
+  })
+  commentDislikes: CommentDislike[];
 }
