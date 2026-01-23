@@ -2,12 +2,10 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
   Repository,
@@ -15,23 +13,47 @@ import {
   // LessThan,
   // EntityManager,
 } from 'typeorm';
+
+import bcrypt from 'bcrypt';
+import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { RedisService } from 'src/redis/redis.service';
+
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Point } from 'src/point/entities/point.entity';
-import { SignUpDto } from './dtos/sign-up.dto';
+
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
-import bcrypt from 'bcrypt';
+import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
 
 @Injectable()
 export class AuthService {
+  private transporter;
+
   constructor(
     private dataSource: DataSource, // 트랜잭션
 
     private configService: ConfigService,
     private readonly jwtService: JwtService,
+    private redisService: RedisService,
+
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+  ) {
+    // Nodemailer 설정
+    this.transporter = nodemailer.createTransport({
+      // SMTP 설정
+      host: 'smtp.gmail.com', // smtp host
+      port: 465, // single connection
+      secure: true,
+      auth: {
+        user: this.configService.get<string>('NODE_MAILER_ID'),
+        pass: this.configService.get<string>('NODE_MAILER_PASSWORD'),
+      },
+    });
+  }
 
   /** 회원 가입(sign-up) API **/
   async signUp(signUpDto: SignUpDto, sourcePage: string) {
@@ -83,8 +105,8 @@ export class AuthService {
         accPoint: 0,
       });
 
-      // // 5-2-3. 인증 이메일 발송
-      // this.mailService.sendEmail(newMember.email, sourcePage);
+      // 5-2-3. 인증 이메일 발송
+      this.sendEmail(newMember.email, sourcePage);
 
       // 5-2-4. 성공: commit
       await queryRunner.commitTransaction();
@@ -160,5 +182,56 @@ export class AuthService {
     const payload = { userId: user.userId, email: user.email };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
+  }
+
+  /** 메일 전송 **/
+  async sendEmail(email: string, sourcePage: string) {
+    try {
+      const certification = await this.createCertification();
+      let subject = '';
+      let text = '';
+
+      // Redis에 인증코드 전달
+      const client = this.redisService.getClient();
+      await client.set(`verified:${email}`, certification);
+      await client.expire(`verified:${email}`, 300);
+
+      // 어느 페이지에서 요청이 왔느냐에 따라 메일 전송 내용 변경
+      if (sourcePage === 'sign-up') {
+        subject = '[5zirap] 회원가입 인증 메일';
+        text = `
+          인증번호 4자리 : ${certification},
+          안녕하세요. [5zirap]의 회원가입을 위한 인증 메일입니다.
+          인증번호를 입력해 주세요.
+          인증 유효시간은 5분 입니다.`;
+      } else if (sourcePage === 'password-update') {
+        subject = '[5zirap] 비밀번호 변경 인증 메일';
+        text = `
+          인증번호 4자리 : ${certification},
+          안녕하세요. [5zirap]의 비밀번호 변경을 위한 인증 메일입니다.
+          인증번호를 입력해 주세요.
+          인증 유효시간은 5분 입니다.`;
+      }
+
+      // 완성된 메일을 user의 email로 전송
+      await this.transporter.sendMail({
+        from: this.configService.get<string>('NODE_MAILER_ID'),
+        to: email, // string or Array
+        subject: subject,
+        text: text,
+      });
+    } catch (err) {
+      console.error('노드메일러 오류 : ', err);
+      throw new InternalServerErrorException(
+        AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.SEND_ERROR,
+      );
+    }
+  }
+
+  /** 인증 코드 생성 **/
+  async createCertification() {
+    // 1. 1000 ~ 9999 사이 랜덤수 생성
+    const certification = Math.floor(1000 + Math.random() * 8999);
+    return certification;
   }
 }
