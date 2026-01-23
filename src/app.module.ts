@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
+import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
-import { PostModule } from './post/post.module';
 import { PointModule } from './point/point.module';
-import { RedisModule } from './redis/redis.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -21,8 +22,9 @@ import { RedisModule } from './redis/redis.module';
     RedisModule,
     AuthModule,
     UserModule,
-    PostModule,
     PointModule,
+    PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
