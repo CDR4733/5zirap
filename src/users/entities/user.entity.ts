@@ -11,6 +11,9 @@ import { Role } from '../types/user-role.type';
 import { SocialType } from '../types/social-type.type';
 import { Point } from 'src/point/entities/point.entity';
 import { PointLog } from 'src/point/entities/point-log.entity';
+import { Post } from 'src/post/entities/post.entity';
+import { PostLike } from 'src/post/entities/post-like.entity';
+import { PostDislike } from 'src/post/entities/post-dislike.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -54,4 +57,17 @@ export class User {
 
   @OneToMany(() => PointLog, (pointLog) => pointLog.user, { cascade: true })
   pointLogs: PointLog[];
+
+  @OneToMany(() => Post, (post) => post.user, { cascade: true })
+  posts: Post[];
+
+  @OneToMany(() => PostLike, (postLike) => postLike.user, {
+    cascade: true,
+  })
+  postLikes: PostLike[];
+
+  @OneToMany(() => PostDislike, (postDislike) => postDislike.user, {
+    cascade: true,
+  })
+  postDislikes: PostDislike[];
 }

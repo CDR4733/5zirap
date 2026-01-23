@@ -37,7 +37,7 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true, // Swagger 새로고침 해도 JWT 유지
       tagsSorter: 'alpha', // API 그룹(태그) 정렬을 알파벳 순으로
-      operationsSorter: 'alpha', // API 그룹 내 정렬을 알파벳 순으로
+      operationsSorter: 'summary', // API 그룹 내 정렬을 summary 이름 순으로
     },
   });
 

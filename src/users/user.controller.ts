@@ -14,7 +14,7 @@ export class UserController {
   /** 내 정보 조회(R) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '내 정보 조회 API' })
+  @ApiOperation({ summary: '01. 내 정보 조회 API' })
   @Get('me')
   async myProfile(@LogIn() user: User) {
     const data = await this.userService.myProfile(user);
