@@ -15,7 +15,7 @@ export class AuthController {
   ) {}
 
   /** 회원 가입(sign-up) API **/
-  @ApiOperation({ summary: '1. 회원 가입(sign-up) API' })
+  @ApiOperation({ summary: '01. 회원 가입(sign-up) API' })
   @Post('sign-up')
   async signUp(
     @Headers('X-Source-Page') sourcePage: string,
@@ -30,7 +30,7 @@ export class AuthController {
   }
 
   /** 로그인(log-in) API **/
-  @ApiOperation({ summary: '2. 로그인(log-in) API' })
+  @ApiOperation({ summary: '02. 로그인(log-in) API' })
   @Post('log-in')
   async logIn(@Body() logInDto: LogInDto) {
     const data = await this.authService.logIn(logInDto);

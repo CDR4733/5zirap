@@ -17,10 +17,15 @@ import { POST_MESSAGE } from 'src/constants/post-message.constant';
 import { PostCategory } from './types/post-category.type';
 import { Order } from './types/post-order.type';
 import { UpdatePostDto } from './dtos/update-post.dto';
+import { RedisService } from 'src/redis/redis.service';
+// import { PointService } from 'src/point/point.service';
+// import { PointType } from 'src/point/types/point.type';
 
 @Injectable()
 export class PostService {
   constructor(
+    private readonly redisService: RedisService,
+    // private readonly pointService: PointService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Post)
@@ -88,7 +93,7 @@ export class PostService {
       { page, limit },
       {
         where: { ...sortCategory, ...keywordFilter },
-        // relations: ['user'],
+        relations: ['user'],
         order: { createdAt: sort ? sort : 'DESC' },
         select: {
           postId: true,
@@ -97,9 +102,9 @@ export class PostService {
           postCategory: true,
           createdAt: true,
           updatedAt: true,
-          //   user: { // 관계 설정 후 활성화
-          //     nickname: true,
-          //   },
+          user: {
+            nickname: true,
+          },
         },
       },
     );
@@ -108,7 +113,7 @@ export class PostService {
       posts: items.map((post) => ({
         postId: post.postId,
         userId: post.userId,
-        // nickname: post?.user?.nickname,
+        nickname: post?.user?.nickname,
         title: post.title,
         numComments: 0,
         postCategory: post.postCategory,
@@ -126,7 +131,8 @@ export class PostService {
     // 1. postId에 해당하는 post 불러오기
     const post = await this.postRepository.findOne({
       where: { postId },
-      //   relations:
+      //   relations: ['user', 'comments', 'postLikes', 'postDislikes'],
+      relations: ['user', 'postLikes', 'postDislikes'],
     });
     // 1-1. post 존재하지 않으면 에러메시지(404)
     if (!post) {
@@ -136,7 +142,7 @@ export class PostService {
     const result = {
       postId: post.postId,
       userId: post.userId,
-      //   nickname: post.user?.nickname,
+      nickname: post.user?.nickname,
       title: post.title,
       postCategory: post.postCategory,
       content: post.content,
@@ -202,7 +208,7 @@ export class PostService {
     const post = await this.postRepository.findOne({
       where: { postId },
       // withDeleted: true,
-      // relations:
+      // relations: ['postLikes', 'postDislikes', 'comments'],
     });
     // 1-1. post가 존재하니? 아니면 에러메시지(404)
     if (!post) {
@@ -214,6 +220,104 @@ export class PostService {
     }
     // 2. DB에서 게시글 삭제
     await this.postRepository.remove(post);
+  }
+
+  /** 게시글 좋아요 클릭 API **/
+  async postLike(userId: number, postId: number) {
+    // 1. 좋아요를 누를 게시글 정보
+    const existingPost = await this.postRepository.findOneBy({ postId });
+    // 1-1. 게시글이 존재하지 않으면 에러처리(404)
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+    // 1-2. 본인의 게시글에는 좋아요를 누를 수 없도록(400)
+    if (existingPost.userId == userId) {
+      throw new BadRequestException(POST_MESSAGE.LIKE.CLICK.FAILURE.NO_SELF);
+    }
+    // 2. 내가 싫어요를 누른 상태인지 아닌지
+    const alreadyDislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 싫어요를 누른 상태라면 좋아요를 누를 수 없도록
+    if (alreadyDislike) {
+      throw new BadRequestException(
+        POST_MESSAGE.LIKE.CLICK.FAILURE.ALREADY_DISLIKE,
+      );
+    }
+    // 3. 내가 좋아요를 누른 상태인지 아닌지
+    const postLike = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    if (!postLike) {
+      // 3-1-A. 게시글 좋아요 명단에 내가 없다면 => 게시글 좋아요 등록
+      await this.postLikeRepository.save({
+        userId,
+        postId,
+      });
+      // // 3-1-B. 게시글 좋아요 생성 포인트 지급
+      // const isValidPoint = await this.pointService.validatePointLog(
+      //   userId,
+      //   PointType.POST_LIKE,
+      // );
+      // if (isValidPoint) {
+      //   this.pointService.savePointLog(userId, PointType.POST_LIKE, true);
+      // }
+    } else {
+      // 3-2-A. 게시글 좋아요 명단에 내가 있다면 => 게시글 좋아요 취소
+      await this.postLikeRepository.delete({
+        userId,
+        postId,
+      });
+      // // 3-2-B. 게시글 좋아요 취소 포인트 차감
+      // this.pointService.savePointLog(userId, PointType.POST_LIKE, false);
+    }
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  async clickPostDislike(userId: number, postId: number) {
+    // 1. 싫어요를 누를 게시글 정보
+    const existingPost = await this.postRepository.findOneBy({ postId });
+    // 1-1. 게시글이 존재하지 않으면 에러처리
+    if (!existingPost) {
+      throw new NotFoundException(POST_MESSAGE.POST.NOT_FOUND);
+    }
+    // 1-2. 본인의 게시글에는 싫어요를 누를 수 없도록
+    if (existingPost.userId == userId) {
+      throw new BadRequestException(POST_MESSAGE.DISLIKE.CLICK.FAILURE.NO_SELF);
+    }
+
+    // 2. 내가 좋아요를 누른 상태인지 아닌지를 확인
+    const alreadyLike = await this.postLikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    // 2-1. 좋아요를 누른 상태라면 싫어요를 누를 수 없도록
+    if (alreadyLike) {
+      throw new BadRequestException(
+        POST_MESSAGE.DISLIKE.CLICK.FAILURE.ALREADY_LIKE,
+      );
+    }
+
+    // 3. 내가 싫어요를 누른 상태인지 아닌지를 확인
+    const postDislike = await this.postDislikeRepository.findOneBy({
+      userId,
+      postId,
+    });
+    if (!postDislike) {
+      // 3-1. 게시글 싫어요 명단에 내가 없다면 => 게시글 싫어요 등록
+      await this.postDislikeRepository.save({
+        userId,
+        postId,
+      });
+    } else {
+      // 3-2. 게시글 싫어요 명단에 내가 있다면 => 게시글 싫어요 취소
+      await this.postDislikeRepository.delete({
+        userId,
+        postId,
+      });
+    }
   }
 
   /** hashtag 유효성 검사 **/

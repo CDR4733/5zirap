@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import {
@@ -35,7 +36,7 @@ export class PostController {
   /** 게시글 생성(C) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '1. 게시글 생성 API' })
+  @ApiOperation({ summary: '01. 게시글 생성 API' })
   @Post()
   async create(@LogIn() user: User, @Body() createPostDto: CreatePostDto) {
     const userId = user.userId;
@@ -51,7 +52,7 @@ export class PostController {
   }
 
   /** 게시글 목록 조회(R-A) API **/
-  @ApiOperation({ summary: '2. 게시글 목록 조회 API' })
+  @ApiOperation({ summary: '02. 게시글 목록 조회 API' })
   @ApiQuery({
     name: 'postCategory',
     required: false,
@@ -96,7 +97,7 @@ export class PostController {
   }
 
   /** 게시글 상세 조회(R-D) API **/
-  @ApiOperation({ summary: '3. 게시글 상세 조회 API' })
+  @ApiOperation({ summary: '03. 게시글 상세 조회 API' })
   @Get(':postId')
   async findOne(@Param('postId') postId: number) {
     const post = await this.postService.findOnePost(postId);
@@ -111,7 +112,7 @@ export class PostController {
   /** 게시글 수정(U) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '4. 게시글 수정 API' })
+  @ApiOperation({ summary: '04. 게시글 수정 API' })
   @Patch(':postId')
   async update(
     @LogIn() user: User,
@@ -130,7 +131,7 @@ export class PostController {
   /** 게시글 삭제(D) API **/
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '5. 게시글 삭제 API' })
+  @ApiOperation({ summary: '05. 게시글 삭제 API' })
   @Delete(':postId')
   async deletePost(@LogIn() user: User, @Param('postId') postId: number) {
     const userId = user.userId;
@@ -139,6 +140,42 @@ export class PostController {
     return {
       status: HttpStatus.OK,
       message: POST_MESSAGE.POST.DELETE.SUCCESS,
+    };
+  }
+
+  /** 게시글 좋아요 클릭 API **/
+  @ApiOperation({ summary: '06. 게시글 좋아요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':postId/likes')
+  async postLike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    const userId = user.userId;
+    await this.postService.postLike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.LIKE.CLICK.SUCCESS,
+    };
+  }
+
+  /** 게시글 싫어요 클릭 API **/
+  @ApiOperation({ summary: '07. 게시글 싫어요 클릭 API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':postId/dislikes')
+  async clickPostDislike(
+    @LogIn() user: User,
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    const userId = user.userId;
+    await this.postService.clickPostDislike(userId, postId);
+
+    return {
+      status: HttpStatus.OK,
+      message: POST_MESSAGE.DISLIKE.CLICK.SUCCESS,
     };
   }
 }

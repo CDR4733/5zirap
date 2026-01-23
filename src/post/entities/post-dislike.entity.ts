@@ -1,12 +1,17 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Post } from './post.entity';
 
 @Entity('post_dislikes')
 export class PostDislike {
+  // 컬럼 설정
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
@@ -18,4 +23,13 @@ export class PostDislike {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // 관계 설정
+  @ManyToOne(() => User, (user) => user.postDislikes, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @ManyToOne(() => Post, (post) => post.postDislikes, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
 }
