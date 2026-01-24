@@ -1,10 +1,18 @@
-import { Body, Controller, Headers, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpStatus,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
 
 @ApiTags('01. AUTH API')
 @Controller('auth')
@@ -29,8 +37,20 @@ export class AuthController {
     };
   }
 
+  /** 이메일 인증 API **/
+  @ApiOperation({ summary: '02. 이메일 인증 API' })
+  @Patch('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    const data = await this.authService.verifyEmail(verifyEmailDto);
+    return {
+      status: HttpStatus.OK,
+      message: AUTH_MESSAGES.VERIFY_EMAIL.SUCCESS,
+      data: data,
+    };
+  }
+
   /** 로그인(log-in) API **/
-  @ApiOperation({ summary: '02. 로그인(log-in) API' })
+  @ApiOperation({ summary: '03. 로그인(log-in) API' })
   @Post('log-in')
   async logIn(@Body() logInDto: LogInDto) {
     const data = await this.authService.logIn(logInDto);

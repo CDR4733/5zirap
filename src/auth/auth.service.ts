@@ -27,6 +27,7 @@ import { Point } from 'src/point/entities/point.entity';
 import { AUTH_MESSAGES } from 'src/constants/auth-message.constant';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { LogInDto } from './dtos/log-in.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -152,6 +153,30 @@ export class AuthService {
     // };
     // // 7. 데이터 반환
     // return data;
+  }
+
+  /** 이메일 인증 API **/
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    const client = this.redisService.getClient();
+    const { email, certification } = verifyEmailDto;
+    const mailedCode = await client.get(`verified:${email}`);
+
+    // 1. 입력된 email 주소가 맞는지?
+    if (!mailedCode) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_EMAIL,
+      );
+    }
+    // 2. 입력된 코드가 발송된 코드와 일치하는지?
+    if (certification !== +mailedCode) {
+      throw new BadRequestException(
+        AUTH_MESSAGES.VERIFY_EMAIL.FAILURE.WRONG_CERTIFICATION,
+      );
+    }
+    // 3. 이메일 인증 완료
+    await this.userRepository.update({ email }, { verifiedEmail: true });
+    // 4. 결과 반환
+    return { verified: email };
   }
 
   /** 로그인(log-in) API **/
