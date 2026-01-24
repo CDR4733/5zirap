@@ -145,11 +145,13 @@
     <!-- FOOTER -->
     <footer>
       <div class="footer-menu">
-        <button onclick="window.location.href='./chat-list'">
+        <button onclick="window.location.href = './chat-list'">
           💬 Live Chat
         </button>
-        <button onclick="window.location.href='./post-list'">📝 게시판</button>
-        <button onclick="window.location.href='./index'">🏠 홈으로</button>
+        <button onclick="window.location.href = './post-list'">
+          📝 게시판
+        </button>
+        <button onclick="window.location.href = './index'">🏠 홈으로</button>
         <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
           🔔 알람
         </button>
@@ -164,8 +166,8 @@
     </footer>
 
     <!-- JS  -->
-    <script type="module" src="/static/js/common/header.js"></script>
-    <script type="module" src="/static/js/index/index.js"></script>
+    <script type="module" src="/js/common/header.js"></script>
+    <script type="module" src="/js/index/index.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </body>
 </html>

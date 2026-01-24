@@ -4,13 +4,17 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { join } from 'path';
+import * as express from 'express';
+// import { json } from 'express';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('SERVER_PORT');
 
   // 모든 엔드포인트 앞에 '/api' 붙이기
-  // app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: ['health-check'] });
 
   // Validation Pipe 적용하기
   app.useGlobalPipes(
@@ -24,6 +28,21 @@ async function bootstrap() {
     }),
   );
 
+  // CORS 설정
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: ['POST', 'GET', 'OPTIONS'],
+    allowedHeaders: ['POST', 'GET'],
+    credentials: true,
+  });
+
+  // 정적 파일 제공 설정
+  app.use(
+    express.static(join(__dirname, '..', 'front', 'html'), {
+      extensions: ['html', 'htm'], // .html 파일을 확장자로 추가
+    }),
+  );
+
   // Swagger 적용하기
   const config = new DocumentBuilder()
     .setTitle('5zirap')
@@ -32,6 +51,7 @@ async function bootstrap() {
     .addTag('NestJS')
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .build();
+  // Swagger 세팅
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
