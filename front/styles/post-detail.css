@@ -1,0 +1,247 @@
+.user-info {
+  float: right;
+}
+
+.post-detail {
+  padding: 20px;
+}
+
+.post-info {
+  margin-bottom: 20px;
+}
+
+.post-info img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+}
+
+.comments {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+
+.comments ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.comments li {
+  margin: 5px 0;
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0;
+}
+
+.comment-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 가운데 정렬 */
+  width: 100%; /* 충분히 넓게 설정 */
+  margin: 20px 0; /* 여백 추가 */
+}
+
+.comment-input textarea {
+  width: 95%; /* 텍스트 영역의 너비 설정 */
+  padding: 10px; /* 패딩 추가 */
+  border: 1px solid #ccc; /* 테두리 스타일 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  resize: none; /* 크기 조정 비활성화 */
+}
+
+.comment-input button {
+  margin-top: 10px; /* 버튼과 텍스트 영역 사이의 간격 */
+  padding: 10px 20px; /* 버튼 패딩 */
+  background-color: #007bff; /* 버튼 배경색 */
+  color: white; /* 버튼 글자색 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  cursor: pointer; /* 마우스 커서 포인터로 변경 */
+}
+
+.edit-comment-input {
+  width: 90%; /* 텍스트 영역의 너비 설정 */
+  padding: 10px; /* 패딩 추가 */
+  border: 1px solid #ccc; /* 테두리 스타일 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  resize: none; /* 크기 조정 비활성화 */
+}
+
+.comment-input button:hover {
+  background-color: #0056b3; /* 버튼 호버 시 색상 변경 */
+}
+
+.recomment-btn {
+  margin-top: 10px; /* 버튼과 텍스트 영역 사이의 간격 */
+  padding: 10px 20px; /* 버튼 패딩 */
+  background-color: #007bff; /* 버튼 배경색 */
+  color: white; /* 버튼 글자색 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  cursor: pointer; /* 마우스 커서 포인터로 변경 */
+}
+
+.recomment-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 가운데 정렬 */
+  width: 100%; /* 충분히 넓게 설정 */
+  margin: 20px 0; /* 여백 추가 */
+}
+
+.recomment-input textarea {
+  width: 95%; /* 텍스트 영역의 너비 설정 */
+  padding: 10px; /* 패딩 추가 */
+  border: 1px solid #ccc; /* 테두리 스타일 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  resize: none; /* 크기 조정 비활성화 */
+}
+
+.recomment-input button {
+  margin-top: 10px; /* 버튼과 텍스트 영역 사이의 간격 */
+  padding: 10px 20px; /* 버튼 패딩 */
+  background-color: #007bff; /* 버튼 배경색 */
+  color: white; /* 버튼 글자색 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  cursor: pointer; /* 마우스 커서 포인터로 변경 */
+  align-items: center; /* 가운데 정렬 */
+}
+
+.recomment-input button:hover {
+  background-color: #0056b3; /* 버튼 호버 시 색상 변경 */
+}
+
+/*게시판 좋아요 싫어요 버튼 */
+.like-dislike {
+  display: flex; /* 버튼들을 수평으로 배치 */
+  justify-content: center; /* 버튼들을 중앙으로 정렬 */
+  margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
+}
+
+.like-dislike button {
+  background-color: white; /* 버튼 배경 색상 */
+  border: 1px solid black; /* 버튼 테두리 없애기 */
+
+  padding: 8px 16px; /* 버튼 안쪽 여백 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  text-decoration: none; /* 텍스트 장식 없애기 */
+  display: inline-block; /* 버튼을 인라인 블록으로 설정 */
+  font-size: 14px; /* 버튼 텍스트 크기 */
+  margin: 4px 2px; /* 버튼 간 여백 */
+  cursor: pointer; /* 커서를 포인터로 변경 (클릭 가능 표시) */
+  border-radius: 4px; /* 버튼 모서리 둥글게 만들기 */
+  transition: background-color 0.3s; /* 배경 색상 변경에 애니메이션 추가 */
+}
+
+.like-dislike button:hover {
+  background-color: #e6e6fa; /* 버튼에 마우스를 올렸을 때 배경 색상 변경 */
+}
+
+/* 좋아요 버튼 활성화 상태 */
+.like-dislike .liked {
+  background-color: #f8d7da; /* 좋아요 클릭 시 배경 색상 */
+  color: #721c24;
+  font-weight: bold;
+}
+
+/* 싫어요 버튼 활성화 상태 */
+.like-dislike .disliked {
+  background-color: #f8d7da; /* 싫어요 클릭 시 배경 색상 */
+  color: #721c24; /* 싫어요 클릭 시 텍스트 색상 */
+  font-weight: bold;
+}
+
+.like-dislike button i {
+  margin-right: 5px; /* 아이콘과 텍스트 간 여백 */
+}
+
+/* 댓글 좋아요 싫어요 버튼 */
+.comment-like-dislike {
+  display: flex; /* 버튼들을 수평으로 배치 */
+  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+  margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
+}
+
+.comment-like-dislike button {
+  background-color: #f2f2f2; /* 버튼 배경 색상 */
+  border: none; /* 버튼 테두리 없애기 */
+  color: #333; /* 버튼 텍스트 색상 */
+  padding: 8px 16px; /* 버튼 안쪽 여백 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  text-decoration: none; /* 텍스트 장식 없애기 */
+  display: inline-block; /* 버튼을 인라인 블록으로 설정 */
+  font-size: 14px; /* 버튼 텍스트 크기 */
+  margin: 4px 2px; /* 버튼 간 여백 */
+  cursor: pointer; /* 커서를 포인터로 변경 (클릭 가능 표시) */
+  border-radius: 4px; /* 버튼 모서리 둥글게 만들기 */
+}
+
+.comment-like-dislike button:hover {
+  background-color: #e6e6fa; /* 버튼에 마우스를 올렸을 때 배경 색상 변경 */
+}
+
+.comment-like-dislike button i {
+  margin-right: 5px; /* 아이콘과 텍스트 간 여백 */
+}
+
+.comment-header {
+  display: flex;
+  flex-direction: row;
+}
+.comment-like-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.comment-dislike-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.comment-like-btn {
+  border: 0px;
+  background-color: white;
+  cursor: pointer;
+}
+.comment-dislike-btn {
+  border: 0px;
+  background-color: white;
+  cursor: pointer;
+}
+
+/*대댓글 좋아요, 싫어요 버튼*/
+.recomment-header {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-like-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-dislike-btn-count {
+  display: flex;
+  flex-direction: row;
+}
+.recomment-like-btn {
+  border: 0px;
+  background-color: white;
+}
+.recomment-dislike-btn {
+  border: 0px;
+  background-color: white;
+}
+
+/* 게시글 수정/삭제 버튼 */
+.edit-del-btn {
+  cursor: pointer;
+}
+
+/* 댓글 수정/삭제 버튼 */
+.comment-edit-del {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* 대댓글 수정/삭제 버튼 */
+.edit-comment-btn,
+.delete-comment-btn {
+  cursor: pointer;
+}

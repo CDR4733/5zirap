@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/chat.css" />
+  </head>
+
+  <body>
+    <header>
+      <div id="logo" class="logo">
+        <div
+          id="logo-home"
+          class="logo-home"
+          onClick="window.location.href='./index'"
+        >
+          5ZIRAP
+        </div>
+        <div
+          id="admin-btn"
+          class="admin-btn"
+          onClick="window.location.href='./log-manager'"
+        >
+          ADMIN
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="./log-in">로그인</a></li>
+          <li><a href="./sign-up">회원가입</a></li>
+          <li><a id="userNickname"></a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="chat">
+          <div class="chat-header">
+            <span id="roomName" class="chatting room name"></span>
+            <button id="toggleMembersButton" class="toggle-members-button">멤버 목록</button>
+          </div>
+          <div class="chat-message-list" id="chatscroll" style="overflow: auto">
+            <div id="fixedImage" class="fixed-image" style="display: none">
+              <div class="fixed-header-container">
+                <div class="fixed-header">📌 고정된 이미지</div>
+                <div id="toggleIcon" style="cursor: pointer">🔼</div>
+                <!-- 접기 버튼 -->
+                <div class="author-info">
+                  <span class="author-bubble" id="authorName"></span>
+                </div>
+              </div>
+              <img
+                id="fixedImageContent"
+                style="width: 30%; height: auto; max-height: 200px"
+              />
+            </div>
+            <!-- 메시지들이 여기에 동적으로 삽입됩니다. -->
+          </div>
+          <div class="chat-composer">
+            <div class="chat-composer-wrapper">
+              <div class="image-preview" id="imagePreview"></div>
+              <input type="file" id="fileInput" class="file-input" />
+              <input
+                type="text"
+                id="messageInput"
+                class="chat-composer-input"
+                placeholder="메시지를 입력하세요"
+              />
+              <label for="fileInput" class="file-upload-icon">📁</label>
+            </div>
+            <button id="sendButton" class="send-button">전송</button>
+          </div>
+
+          <!-- 멤버 목록 토글 창 -->
+          <div id="membersList" class="members-list" style="display: none;">
+            <div class="members-list-header">
+              <span>현재 접속 멤버</span>
+              <button id="closeMembersButton" class="close-members-button">X</button>
+            </div>
+            <ul id="membersContainer">
+              <!-- 멤버 이름들이 여기에 동적으로 추가됩니다 -->
+            </ul>
+          </div>
+        </div>
+    </main>
+
+    <footer>
+      <div class="footer-menu">
+        <button onclick="window.location.href='./chat-list'">
+          💬 Live Chat
+        </button>
+        <button onclick="window.location.href='./post-list'">📝 게시판</button>
+        <button onclick="window.location.href='./index'">🏠 홈으로</button>
+        <button id="alarmButton" class="footerAlarm" onclick="clickAlarmBtn()">
+          🔔 알람
+        </button>
+        <button
+          id="myPageButton"
+          class="my-page-button"
+          onclick="clickMyPageBtn()"
+        >
+          🏆 마이페이지
+        </button>
+      </div>
+    </footer>
+
+    <script
+      type="module"
+      src="https://cdn.socket.io/4.5.1/socket.io.min.js"
+    ></script>
+    <script type="module" src="/static/js/common/header.js"></script>
+    <script type="module" src="/static/js/chat/chat.js"></script>
+  </body>
+</html>
